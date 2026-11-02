@@ -1,0 +1,183 @@
+/* theme.css — maps tokens.css onto Tailwind v4's theme variables.
+ * Values never live here; every entry references a custom property from tokens.css. The one exception is
+ * the `progress-indeterminate` keyframe at the foot: Tailwind needs the @keyframes in the same block as
+ * the --animate-* entry, and the design does not tokenise its duration either. Same-name entries
+ * (--font-sans, --shadow-sm, --radius-sm, --tracking-wide, --ease-out) are safe: Tailwind emits them inside
+ * @layer theme and the unlayered :root block of tokens.css wins the cascade, so the utility resolves to
+ * the token (checked in the built stylesheet). */
+@theme inline {
+  /* Tailwind's default palette is cleared so a color that is not a token does not compile: `text-white`,
+   * `bg-slate-500` or `bg-sky-100` emit nothing (ADR-0007). White is `--card` or a `-foreground` role, the
+   * dialog backdrop is `--overlay`; everything below repopulates the namespace from tokens.css. */
+  --color-*: initial;
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
+  --tracking-tight: var(--tracking-tight);
+  --tracking-wide: var(--tracking-wide);
+
+  /* Semantic roles — every role in tokens.css, 1:1 (guidelines/design-system-spec.md §1.1). */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  /* Each status family is two pairs: the strong 300 fill a button wears, and the subtle 100 tint a badge
+   * wears — both under the family's own 900 ink. The subtle foreground is also the family's text color on
+   * a neutral ground, which is what error messages and destructive menu items read. */
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive-subtle-foreground: var(--destructive-subtle-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-subtle-foreground: var(--success-subtle-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-subtle-foreground: var(--warning-subtle-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-funnel-complete: var(--funnel-complete);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Interaction steps on the dark primary (hover:bg-primary-hover, active:bg-primary-active). */
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-disabled: var(--primary-disabled);
+
+  /* Primitive scales the export's component styles read directly (badge and alert tints, pressed and
+   * secondary-hover steps, heatmap ramp). Each full scale replaces Tailwind's default palette of the same
+   * name, so `bg-red-100` is the brand red. The chart-only primitives (rose, sky, plum) are deliberately
+   * not mapped: a component reaches them through --color-chart-2/4/5, never by name. */
+  --color-primary-50: var(--primary-50);
+  --color-primary-100: var(--primary-100);
+  --color-primary-200: var(--primary-200);
+  --color-primary-300: var(--primary-300);
+  --color-primary-400: var(--primary-400);
+  --color-primary-500: var(--primary-500);
+  --color-primary-600: var(--primary-600);
+  --color-primary-700: var(--primary-700);
+  --color-primary-800: var(--primary-800);
+  --color-primary-900: var(--primary-900);
+  --color-primary-950: var(--primary-950);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+  --color-violet-50: var(--violet-50);
+  --color-violet-100: var(--violet-100);
+  --color-violet-200: var(--violet-200);
+  --color-violet-300: var(--violet-300);
+  --color-violet-400: var(--violet-400);
+  --color-violet-500: var(--violet-500);
+  --color-violet-600: var(--violet-600);
+  --color-violet-700: var(--violet-700);
+  --color-violet-800: var(--violet-800);
+  --color-violet-900: var(--violet-900);
+  --color-violet-950: var(--violet-950);
+  --color-red-50: var(--red-50);
+  --color-red-100: var(--red-100);
+  --color-red-200: var(--red-200);
+  --color-red-300: var(--red-300);
+  --color-red-400: var(--red-400);
+  --color-red-500: var(--red-500);
+  --color-red-600: var(--red-600);
+  --color-red-700: var(--red-700);
+  --color-red-800: var(--red-800);
+  --color-red-900: var(--red-900);
+  --color-red-950: var(--red-950);
+  --color-green-50: var(--green-50);
+  --color-green-100: var(--green-100);
+  --color-green-200: var(--green-200);
+  --color-green-300: var(--green-300);
+  --color-green-400: var(--green-400);
+  --color-green-500: var(--green-500);
+  --color-green-600: var(--green-600);
+  --color-green-700: var(--green-700);
+  --color-green-800: var(--green-800);
+  --color-green-900: var(--green-900);
+  --color-green-950: var(--green-950);
+  --color-amber-50: var(--amber-50);
+  --color-amber-100: var(--amber-100);
+  --color-amber-200: var(--amber-200);
+  --color-amber-300: var(--amber-300);
+  --color-amber-400: var(--amber-400);
+  --color-amber-500: var(--amber-500);
+  --color-amber-600: var(--amber-600);
+  --color-amber-700: var(--amber-700);
+  --color-amber-800: var(--amber-800);
+  --color-amber-900: var(--amber-900);
+  --color-amber-950: var(--amber-950);
+
+  /* Shape: rounded-sm/md/lg/xl read the token scale; rounded-full is Tailwind's own pill. */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-card: var(--shadow-card);
+
+  /* Layout: max-w-content is the 1440px content column. Sidebar and top bar sizes are Tailwind steps
+   * (w-54, w-16, h-14) or read the token directly with w-(--sidebar-width). */
+  --container-content: var(--content-max-width);
+
+  /* Motion: the plain `transition` and `ease-out` utilities become the brand curve and duration;
+   * `duration-(--duration-base)` reads the other steps. */
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+  --default-transition-duration: var(--duration-fast);
+  --default-transition-timing-function: var(--ease-out);
+
+  /* The one motion definition Tailwind has no utility for: the indeterminate Progress bar, a 40%-wide
+   * bar crossing its track (the export's `lb-indeterminate`). Tailwind requires the @keyframes beside
+   * the --animate-* entry that names it. The 2 s is the export's own literal — the motion tokens stop
+   * at 300 ms and the design does not tokenise it either (docs/design-system.md §8). */
+  --animate-progress-indeterminate: progress-indeterminate 2s var(--ease-in-out) infinite;
+
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
+  }
+}

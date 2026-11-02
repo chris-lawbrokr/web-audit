@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+/* The enter/exit utilities shadcn's overlays carry (animate-in, fade-in-0, zoom-in-95…); the CLI adds this
+ * import on `init`, not on `add`, so without it those generated classes do nothing. Durations and curves
+ * come from the motion tokens, not from here. */
+@import 'tw-animate-css';
+/* The design's tokens, then their Tailwind mapping. Nothing in this file holds a value. */
+@import './tokens.css';
+@import './theme.css';
+
+/*
+ * LIGHT MODE ONLY. The `dark` variant is re-pointed at a class nothing sets, so the `dark:` utilities in
+ * generated shadcn primitives stay inert instead of following `prefers-color-scheme`. This line is also
+ * the extension point should dark mode ever be added.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* What the audit screens add on top of the tokens, as in the mock. */
+@theme {
+  /* Page gutter (`px-gutter`): 16px on a phone easing up to 32px on desktop. */
+  --spacing-gutter: clamp(16px, 4vw, 32px);
+  /* Findings, the quiz's "all set" and the gate card arrive with a short lift (`animate-pop`). */
+  --animate-pop: pop var(--duration-slow) var(--ease-out) both;
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* "Download PDF" is the browser's print-to-PDF; keep the brand fills on paper. */
+  @media print {
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+}

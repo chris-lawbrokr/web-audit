@@ -1,0 +1,4 @@
+# single-package project; settings live here for pnpm 11
+engineStrict: true
+# pnpm 11's default is one day already; stated so a pnpm downgrade or a per-machine config cannot lose it.
+minimumReleaseAge: 1440
