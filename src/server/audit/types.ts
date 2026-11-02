@@ -1,44 +1,95 @@
 import 'server-only';
 
-/** The raw measurements behind a report. */
-export interface AuditMetrics {
-  /** Google rating, out of 5. */
-  rating: number;
-  /** Google review count. */
-  reviews: number;
-  /** Seconds to load on a phone. */
-  mobile: number;
-  /** Seconds to load on desktop. */
-  desktop: number;
-  /** Percent of visitors who leave after one page. */
-  bounce: number;
-  /** Estimated visits a month. */
-  visits: number;
-  /** Search visibility, out of 100. */
-  seo: number;
-  /** AI-answer visibility, out of 100. */
-  geo: number;
-}
+import type { CheckKey } from '@/shared/audit/checks';
 
-export interface Competitor {
+/*
+ * What an audit measured. Every number here came from a provider during this audit; when a check had
+ * nothing to measure, it carries the reason instead, and the report says so rather than guessing.
+ */
+
+export type Outcome<T> = { ok: true; value: T } | { ok: false; reason: string };
+
+export const measured = <T>(value: T): Outcome<T> => ({ ok: true, value });
+export const unmeasured = (reason: string): { ok: false; reason: string } => ({
+  ok: false,
+  reason,
+});
+
+export interface Business {
   name: string;
-  rating: number;
+  domain: string | null;
+  /** Google's listing id, which identifies the firm in the map pack. */
+  cid: string | null;
+  /** Out of 5; null when the listing has no reviews. */
+  rating: number | null;
   reviews: number;
 }
 
-/** The comparison points drawn against the firm's own numbers. */
-export const BENCHMARKS = {
-  /** Google's "good" largest contentful paint, in seconds. */
-  speedTarget: 2.5,
-  /** The longest load the speed bars are drawn against, in seconds. */
-  speedScale: 8,
-  legalBounce: 52,
-  topBounce: 38,
-  nearbyVisits: 4600,
-  topVisits: 9200,
-  nearbyVisibility: 58,
-  /** How many AI answers are checked for a mention. */
-  aiQueries: 12,
-  /** How many pages the scan reads. */
-  pagesRead: 42,
-} as const;
+export interface Competitor extends Business {
+  /** From the firm's office; null when either location is unknown. */
+  miles: number | null;
+}
+
+export interface ReviewsResult {
+  firm: Business;
+  competitors: Competitor[];
+}
+
+export interface DeviceSpeed {
+  /** Lighthouse lab test, seconds to the largest contentful paint. */
+  labSeconds: number;
+  /** Chrome's real visitors (75th percentile); null when Google lacks the data. */
+  fieldSeconds: number | null;
+}
+
+export interface SpeedResult {
+  phone: DeviceSpeed;
+  /** Null if only the desktop test failed. */
+  desktop: DeviceSpeed | null;
+}
+
+export interface TrafficResult {
+  /** Semrush's estimate of monthly visits from Google search. */
+  firmVisits: number;
+  /** Competitors Semrush had data for. */
+  competitors: { name: string; visits: number }[];
+}
+
+export interface SearchCheck {
+  query: string;
+  /** Position among the organic results (top 20), or null if not there. */
+  firmRank: number | null;
+  firmInLocalPack: boolean;
+  /** Competitors in the top 10 or the local pack. */
+  competitorsShown: string[];
+}
+
+export type AnswerSource = 'ChatGPT' | 'Perplexity' | 'Google AI Overview';
+
+export interface AnswerCheck {
+  source: AnswerSource;
+  question: string;
+  firmMentioned: boolean;
+  competitorsMentioned: string[];
+}
+
+export interface VisibilityResult {
+  place: string;
+  /** Every competitor looked for, including ones that never turned up. */
+  competitors: string[];
+  searches: SearchCheck[];
+  answers: AnswerCheck[];
+}
+
+export interface AuditResults {
+  reviews: Outcome<ReviewsResult>;
+  speed: Outcome<SpeedResult>;
+  traffic: Outcome<TrafficResult>;
+  visibility: Outcome<VisibilityResult>;
+}
+
+/** Results as they arrive: a check is missing until it settles. */
+export type PartialResults = { [K in CheckKey]?: AuditResults[K] };
+
+/** Google's "good" largest contentful paint, in seconds (web.dev/lcp). */
+export const LCP_TARGET_SECONDS = 2.5;

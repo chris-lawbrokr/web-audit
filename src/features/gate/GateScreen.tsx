@@ -1,7 +1,6 @@
 import { Lock } from 'lucide-react';
 
 import type { UnlockRequest } from '@/shared/audit/contracts';
-import { headlineFor } from '@/shared/audit/headline';
 import { IconTile } from '@/shared/ui/IconTile';
 import { Overline } from '@/shared/ui/Overline';
 
@@ -13,10 +12,10 @@ import { ScorePreview } from './ScorePreview';
  * grid cell, so the card overlaps the preview without taking it out of the page's flow.
  */
 export function GateScreen({
-  findingsCount,
+  headline,
   onUnlock,
 }: {
-  findingsCount: number;
+  headline: string;
   onUnlock: (lead: UnlockRequest) => Promise<void>;
 }) {
   return (
@@ -40,7 +39,7 @@ export function GateScreen({
               Unlock your health score
             </h1>
             <p className="text-sm leading-[21px] text-pretty text-muted-foreground">
-              {headlineFor(findingsCount)} Tell us who you are to see the full breakdown.
+              {headline} Tell us who you are to see the full breakdown.
             </p>
           </div>
           <LeadForm onSubmit={onUnlock} />

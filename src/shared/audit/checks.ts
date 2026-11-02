@@ -1,13 +1,15 @@
-/** The five things the audit scores, in the order the scan and the report show them. */
-export const CHECK_KEYS = ['reviews', 'speed', 'bounce', 'traffic', 'visibility'] as const;
+/**
+ * The four things the audit measures, in the order the scan and the report show them. Bounce rate is
+ * left out: no data source the audit has access to measures it (Semrush's Trends API would).
+ */
+export const CHECK_KEYS = ['reviews', 'speed', 'traffic', 'visibility'] as const;
 
 export type CheckKey = (typeof CHECK_KEYS)[number];
 
 export interface Check {
   key: CheckKey;
   title: string;
-  blurb: string;
-  /** What the scan says it is doing, in order, while this check is active. */
+  /** What the scan says it is doing while this check runs, in order. */
   steps: readonly string[];
 }
 
@@ -15,47 +17,26 @@ export const CHECKS: readonly Check[] = [
   {
     key: 'reviews',
     title: 'Google reviews',
-    blurb: 'Your rating and review count against the three closest competitors.',
     steps: [
+      'Reading your homepage',
       'Finding your Google Business Profile',
       'Locating competitors within 10 miles',
-      'Comparing ratings and review counts',
     ],
   },
   {
     key: 'speed',
     title: 'Load speed',
-    blurb: 'How long your site takes to appear on a phone and on desktop.',
-    steps: [
-      'Loading your homepage on a mid-range phone',
-      'Measuring largest contentful paint',
-      'Repeating the test on desktop',
-    ],
-  },
-  {
-    key: 'bounce',
-    title: 'Bounce rate',
-    blurb: 'How many visitors leave after a single page.',
-    steps: [
-      'Estimating engagement from traffic panels',
-      'Comparing against legal-industry benchmarks',
-    ],
+    steps: ['Loading your homepage on a phone and on desktop'],
   },
   {
     key: 'traffic',
-    title: 'Traffic volume',
-    blurb: 'Estimated monthly visits, and where they come from.',
-    steps: ['Estimating monthly visits', 'Splitting sources: search, direct, referral'],
+    title: 'Search traffic',
+    steps: ['Estimating your visits from Google', 'Estimating competitors’ visits'],
   },
   {
     key: 'visibility',
     title: 'SEO & GEO visibility',
-    blurb: 'How often Google and AI assistants recommend your firm.',
-    steps: [
-      'Checking 40 local practice-area searches',
-      'Asking ChatGPT, Perplexity and AI Overviews who to hire',
-      'Scoring citations and directory mentions',
-    ],
+    steps: ['Running local Google searches', 'Asking ChatGPT and Perplexity who to hire'],
   },
 ];
 
@@ -72,3 +53,5 @@ export const PRACTICE_AREAS = [
   'Workers’ compensation',
   'Other',
 ] as const;
+
+export type PracticeArea = (typeof PRACTICE_AREAS)[number];

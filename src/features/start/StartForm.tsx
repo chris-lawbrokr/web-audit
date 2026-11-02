@@ -88,9 +88,6 @@ export function StartForm() {
           {error}
         </span>
       )}
-      <span className="text-[13px] text-muted-foreground">
-        Free. Nothing to install, and we never touch your site.
-      </span>
     </form>
   );
 }

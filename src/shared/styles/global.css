@@ -18,7 +18,7 @@
 @theme {
   /* Page gutter (`px-gutter`): 16px on a phone easing up to 32px on desktop. */
   --spacing-gutter: clamp(16px, 4vw, 32px);
-  /* Findings, the quiz's "all set" and the gate card arrive with a short lift (`animate-pop`). */
+  /* Findings and the gate card arrive with a short lift (`animate-pop`). */
   --animate-pop: pop var(--duration-slow) var(--ease-out) both;
 
   @keyframes pop {

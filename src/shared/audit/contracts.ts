@@ -3,7 +3,6 @@ import { z } from 'zod';
 import type { CheckKey } from './checks';
 import { PRACTICE_AREAS } from './checks';
 import { cleanDomain, isValidDomain } from './domain';
-import { CLIENT_SOURCES, GOALS, GUESSES, REPLY_SPEEDS } from './quiz';
 
 /*
  * What the browser and the API exchange, shared so both sides validate the same way. Request bodies
@@ -28,15 +27,6 @@ export const createAuditRequest = z.object({
   url: z.string().transform(cleanDomain).refine(isValidDomain, { message: URL_INVALID }),
 });
 
-export const quizAnswers = z.object({
-  guess: z.enum(GUESSES.map((guess) => guess.label)).optional(),
-  goal: z.enum(GOALS).optional(),
-  reply: z.enum(REPLY_SPEEDS).optional(),
-  source: z.enum(CLIENT_SOURCES).optional(),
-});
-
-export type QuizAnswers = z.infer<typeof quizAnswers>;
-
 export const unlockRequest = z.object({
   firstName: z.string().trim().min(1, NAME_REQUIRED).max(100),
   lastName: z.string().trim().max(100),
@@ -59,7 +49,7 @@ export interface ApiError {
 
 /** Icon names for the scan's discoveries; the UI maps each to an icon. */
 export type DiscoveryIcon =
-  'map-pin' | 'users' | 'smartphone' | 'pointer' | 'trending-up' | 'sparkles';
+  'map-pin' | 'users' | 'smartphone' | 'search' | 'trending-up' | 'sparkles';
 
 /** A finding the scan reveals as it goes. Nothing here may give away a score. */
 export interface Discovery {
@@ -84,10 +74,8 @@ export interface AuditSnapshot {
   progress: number;
   checks: readonly { key: CheckKey; status: CheckStatus; subStep: string }[];
   discoveries: readonly Discovery[];
-  pagesRead: number;
-  answers: QuizAnswers;
-  /** Only once complete: drives the gate's "We found N things" line. */
-  findingsCount: number | null;
+  /** Only once complete: the gate's one-line summary, like "We found 3 things…". */
+  headline: string | null;
   /** Only once unlocked. */
   reportId: string | null;
 }
@@ -110,8 +98,11 @@ export interface ComparisonRow {
 export interface CategoryReport {
   key: CheckKey;
   title: string;
-  score: number;
-  band: Band;
+  /** Null when there was no data to score: see `unavailable`. */
+  score: number | null;
+  band: Band | null;
+  /** Why this check couldn't be measured, for the visitor; null when it was. */
+  unavailable: string | null;
   /** The headline number, like "4.4" or "5.2s". */
   metric: string;
   metricLabel: string;
@@ -120,6 +111,8 @@ export interface CategoryReport {
   fix: string;
   /** The recommendation in a line, for "Fix these first". */
   short: string;
+  /** Where the numbers come from, for "How we measured this". */
+  source: string;
 }
 
 /** The unlocked report: one snapshot for the report page and its printed copy. */
@@ -127,13 +120,11 @@ export interface ReportPayload {
   domain: string;
   ranAt: string;
   competitorsCompared: number;
-  goalPhrase: string | null;
-  overall: number;
-  band: Band;
+  /** Null when fewer than three checks had data. */
+  overall: number | null;
+  band: Band | null;
   headline: string;
-  guessFeedback: string;
   fixFirst: readonly CategoryReport[];
   categories: readonly CategoryReport[];
   lead: { firstName: string; lastName: string; email: string };
-  sampleData: boolean;
 }

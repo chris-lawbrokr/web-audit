@@ -6,5 +6,5 @@ import { apiError } from '@/server/http';
 export async function GET(_request: Request, { params }: { params: Promise<{ auditId: string }> }) {
   const audit = findAudit((await params).auditId);
   if (!audit) return apiError(404, 'not_found', 'No audit with that id.');
-  return Response.json(snapshotOf(audit, Date.now()));
+  return Response.json(snapshotOf(audit));
 }

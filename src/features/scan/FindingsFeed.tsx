@@ -14,13 +14,7 @@ import { Spinner } from '@/shared/ui/Spinner';
  * "What we're finding": findings appear as the scan reaches each one. When the card has a fixed height
  * (the two-column layout) the feed scrolls inside it and follows the newest finding.
  */
-export function FindingsFeed({
-  pagesRead,
-  discoveries,
-}: {
-  pagesRead: number;
-  discoveries: readonly Discovery[];
-}) {
+export function FindingsFeed({ discoveries }: { discoveries: readonly Discovery[] }) {
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,10 +29,7 @@ export function FindingsFeed({
 
   return (
     <Card className="flex min-h-[120px] flex-1 flex-col gap-3.5 p-5">
-      <div className="flex items-center justify-between gap-3">
-        <Overline>What we’re finding</Overline>
-        <span className="text-xs text-muted-foreground tabular-nums">{pagesRead} pages read</span>
-      </div>
+      <Overline>What we’re finding</Overline>
 
       <div
         ref={listRef}

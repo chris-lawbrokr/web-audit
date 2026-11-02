@@ -2,5 +2,5 @@
 export function headlineFor(findingsCount: number): string {
   return findingsCount === 0
     ? 'Your marketing is in good shape.'
-    : `We found ${findingsCount} things likely costing you consultations.`;
+    : `We found ${findingsCount} ${findingsCount === 1 ? 'thing' : 'things'} likely costing you consultations.`;
 }

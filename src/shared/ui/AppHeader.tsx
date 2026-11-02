@@ -4,14 +4,12 @@ import { RotateCcw } from 'lucide-react';
 import { BASE_PATH } from '@/shared/config/base-path';
 import { cn } from '@/shared/lib/cn';
 
-import { Badge } from './Badge';
-
 /**
- * The 56px top bar on every page: logo and product name, a "Sample data" flag while no real provider
- * is connected, and a way back to the start once there's a report on screen. On a phone there isn't
- * room for the product name and that link side by side, so the name gives way.
+ * The 56px top bar on every page: logo and product name, and a way back to the start once there's a
+ * report on screen. On a phone there isn't room for the product name and that link side by side, so
+ * the name gives way.
  */
-export function AppHeader({ restart = false, sample }: { restart?: boolean; sample: boolean }) {
+export function AppHeader({ restart = false }: { restart?: boolean }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-card px-gutter print:hidden">
       <div className="flex min-w-0 items-center gap-3">
@@ -32,11 +30,6 @@ export function AppHeader({ restart = false, sample }: { restart?: boolean; samp
         >
           Marketing web audit
         </span>
-        {sample && (
-          <Badge variant="warning" uppercase={false}>
-            Sample data
-          </Badge>
-        )}
       </div>
 
       {restart && (

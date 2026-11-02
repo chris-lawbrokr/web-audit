@@ -8,8 +8,12 @@ import { BASE_PATH } from '@/shared/config/base-path';
  * Every environment variable the server reads, validated once at boot (src/instrumentation.ts): with a
  * missing or malformed value the server logs every problem and fails each request until it is fixed.
  * `.env.example` lists them in the same groups as the rules below.
+ *
+ * The provider keys are always required: every audit runs on real data, and there is no sample mode
+ * to fall back on.
  */
 
+const requiredString = z.string({ error: 'required' }).min(1, 'required');
 const optionalString = z.string().optional();
 const optionalUrl = z.url().optional();
 const optionalSecret = z.string().min(32, 'must be at least 32 characters').optional();
@@ -23,12 +27,11 @@ const schema = z.object({
   DATABASE_URL_UNPOOLED: optionalUrl,
   BLOB_READ_WRITE_TOKEN: optionalString,
 
-  DATAFORSEO_LOGIN: optionalString,
-  DATAFORSEO_PASSWORD: optionalString,
-  SEMRUSH_API_KEY: optionalString,
-  GOOGLE_API_KEY: optionalString,
+  DATAFORSEO_LOGIN: requiredString,
+  DATAFORSEO_PASSWORD: requiredString,
+  SEMRUSH_API_KEY: requiredString,
+  GOOGLE_API_KEY: requiredString,
 
-  AUDIT_PROVIDERS: z.enum(['live', 'fixtures']).optional(),
   APP_BASE_URL: optionalUrl,
   NEXT_PUBLIC_BOOKING_URL: optionalUrl,
 
@@ -41,14 +44,6 @@ const schema = z.object({
 type RawEnv = z.infer<typeof schema>;
 type Key = keyof RawEnv;
 
-const REQUIRED_WHEN_LIVE = [
-  'DATAFORSEO_LOGIN',
-  'DATAFORSEO_PASSWORD',
-  'SEMRUSH_API_KEY',
-  'GOOGLE_API_KEY',
-  'NEXT_PUBLIC_BOOKING_URL',
-] as const satisfies readonly Key[];
-
 const REQUIRED_WHEN_DEPLOYED = [
   'DATABASE_URL',
   'DATABASE_URL_UNPOOLED',
@@ -57,11 +52,11 @@ const REQUIRED_WHEN_DEPLOYED = [
   'IP_HASH_SALT',
 ] as const satisfies readonly Key[];
 
-const REQUIRED_IN_PRODUCTION = ['APP_BASE_URL', 'SENTRY_DSN'] as const satisfies readonly Key[];
-
-function resolveProviders(raw: RawEnv): 'live' | 'fixtures' {
-  return raw.AUDIT_PROVIDERS ?? (raw.VERCEL_ENV === 'production' ? 'live' : 'fixtures');
-}
+const REQUIRED_IN_PRODUCTION = [
+  'APP_BASE_URL',
+  'SENTRY_DSN',
+  'NEXT_PUBLIC_BOOKING_URL',
+] as const satisfies readonly Key[];
 
 function resolveBaseUrl(raw: RawEnv): string {
   if (raw.APP_BASE_URL !== undefined) return raw.APP_BASE_URL.replace(/\/$/, '');
@@ -79,25 +74,11 @@ const envSchema = schema
       }
     };
 
-    const providers = resolveProviders(raw);
     const deployed = raw.VERCEL_ENV === 'preview' || raw.VERCEL_ENV === 'production';
-
-    if (raw.VERCEL_ENV === 'production' && providers === 'fixtures') {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['AUDIT_PROVIDERS'],
-        message: 'fixtures is not allowed in Production',
-      });
-    }
-    if (providers === 'live') requireAll(REQUIRED_WHEN_LIVE, 'when AUDIT_PROVIDERS=live');
     if (deployed) requireAll(REQUIRED_WHEN_DEPLOYED, 'on Vercel deployments');
     if (raw.VERCEL_ENV === 'production') requireAll(REQUIRED_IN_PRODUCTION, 'in Production');
   })
-  .transform((raw) => ({
-    ...raw,
-    AUDIT_PROVIDERS: resolveProviders(raw),
-    APP_BASE_URL: resolveBaseUrl(raw),
-  }));
+  .transform((raw) => ({ ...raw, APP_BASE_URL: resolveBaseUrl(raw) }));
 
 export type Env = z.infer<typeof envSchema>;
 

@@ -4,7 +4,7 @@ import type { ReportPayload } from '@/shared/audit/contracts';
 
 import { env } from '../config/env';
 
-/** The mock's scheduler link, used when NEXT_PUBLIC_BOOKING_URL is unset (it is required when live). */
+/** Lawbrokr's scheduler link, used when NEXT_PUBLIC_BOOKING_URL is unset (it is required in Production). */
 const DEFAULT_BOOKING_URL =
   'https://meetings.hubspot.com/jgutmann/discovery-call-website?uuid=c4373772-c271-4e0d-b28c-8020dbac4b26';
 

@@ -3,11 +3,11 @@ import Link from 'next/link';
 import { AppHeader } from '@/shared/ui/AppHeader';
 import { Overline } from '@/shared/ui/Overline';
 
-/** Unknown addresses, and audits or reports that no longer exist (the sample store resets on restart). */
+/** Unknown addresses, and audits or reports that no longer exist (the in-memory store resets on restart). */
 export default function NotFound() {
   return (
     <>
-      <AppHeader sample={false} />
+      <AppHeader />
       <main className="flex flex-1 flex-col items-center gap-4 px-gutter pt-[clamp(48px,10vh,112px)] text-center">
         <Overline tone="accent">Not found</Overline>
         <h1 className="font-serif text-[length:clamp(28px,4vw,40px)] leading-[1.1] font-semibold text-balance text-primary-900">
