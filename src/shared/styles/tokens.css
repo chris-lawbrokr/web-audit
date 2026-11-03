@@ -192,12 +192,19 @@
     0 0 10px -4px oklch(0.249 0.116 291.1 / 0.06), 0 8px 24px -10px oklch(0.249 0.116 291.1 / 0.14);
 
   /* ───────── Type ───────── */
-  --font-sans: 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
+  /* next/font self-hosts both faces under generated names and passes them in as --font-instrument-sans
+   * and --font-host-grotesk (src/app/layout.tsx). Each var() falls back to the face's own name, so a
+   * missing variable can't void the whole stack. */
+  --font-sans:
+    var(--font-instrument-sans, 'Instrument Sans'), 'Helvetica Neue', Helvetica, Arial, system-ui,
+    sans-serif;
   /* The display face: Host Grotesk 600 replaced Playfair Display in the 2026-09-21 export. The token name
    * is kept although Host Grotesk is a grotesque — renaming it would break the theme mapping, every
    * component that reads it and the visitor flow's runtime override contract. The fallback steps down to
    * the UI sans so a failed load keeps one category rather than switching mid-layout. */
-  --font-serif: 'Host Grotesk', 'Instrument Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif:
+    var(--font-host-grotesk, 'Host Grotesk'), var(--font-instrument-sans, 'Instrument Sans'),
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
   --tracking-tight: -0.015em; /* display */
   --tracking-wide: 0.08em; /* uppercase overlines and table headers */

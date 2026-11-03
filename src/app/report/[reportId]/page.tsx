@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CategoryCard } from '@/features/report/CategoryCard';
+import { HomepageCard } from '@/features/report/HomepageCard';
 import { PrintButton } from '@/features/report/PrintButton';
 import { ScoreSummary } from '@/features/report/ScoreSummary';
 import { WalkthroughBanner } from '@/features/report/WalkthroughBanner';
@@ -61,6 +62,9 @@ export default async function ReportPage({ params }: { params: Promise<{ reportI
               <CategoryCard key={category.key} category={category} />
             ))}
           </div>
+
+          {/* Reports saved before the homepage was recorded have no `homepage` at all; they skip the card. */}
+          {report.homepage !== undefined && <HomepageCard homepage={report.homepage} />}
 
           <WalkthroughBanner bookingUrl={bookingUrl} />
         </div>

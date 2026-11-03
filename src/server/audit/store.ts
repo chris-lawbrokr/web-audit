@@ -4,6 +4,7 @@ import type { CheckKey } from '@/shared/audit/checks';
 import type {
   CheckStatus,
   Discovery,
+  HomepageFacts,
   ReportPayload,
   UnlockRequest,
 } from '@/shared/audit/contracts';
@@ -34,6 +35,8 @@ export interface AuditRecord {
   results: PartialResults;
   /** How many competitors the report compares against. */
   competitorCount: number;
+  /** Null until the homepage is read, and after if no version of the address answered. */
+  homepage: HomepageFacts | null;
   spend: Spend;
   reportId: string | null;
 }

@@ -115,6 +115,18 @@ export interface CategoryReport {
   source: string;
 }
 
+/** What the one request to the firm's homepage found, on its own, before Google's listing is added. */
+export interface HomepageFacts {
+  /** The address that answered, after any redirects. */
+  url: string;
+  name: string | null;
+  phone: string | null;
+  /** "Glendale, CA", or null when the page gives no address. */
+  place: string | null;
+  /** Matched from the page's words alone; null when nothing matched. */
+  practiceArea: string | null;
+}
+
 /** The unlocked report: one snapshot for the report page and its printed copy. */
 export interface ReportPayload {
   domain: string;
@@ -126,5 +138,7 @@ export interface ReportPayload {
   headline: string;
   fixFirst: readonly CategoryReport[];
   categories: readonly CategoryReport[];
+  /** Null when no version of the address answered with a page. */
+  homepage: HomepageFacts | null;
   lead: { firstName: string; lastName: string; email: string };
 }

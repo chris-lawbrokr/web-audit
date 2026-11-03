@@ -8,6 +8,8 @@ import { fetchPublicHtml } from './safe-fetch';
  */
 
 export interface SiteFacts {
+  /** The address that answered, after any redirects. */
+  url: string;
   /** The firm's name as the site gives it, most reliable first. */
   names: string[];
   city: string | null;
@@ -107,7 +109,7 @@ function visibleText(html: string): string {
   ).slice(0, 150_000);
 }
 
-export function factsFrom(html: string): SiteFacts {
+export function factsFrom(html: string, url: string): SiteFacts {
   const title = decode(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? '');
   const nodes = jsonLdNodes(html);
   const firms = nodes.filter((node) => typesOf(node).some((type) => FIRM_TYPES.includes(type)));
@@ -131,6 +133,7 @@ export function factsFrom(html: string): SiteFacts {
     .map(firmName);
 
   return {
+    url,
     names: [...new Set(names)],
     city: address?.city ?? null,
     region: address?.region ?? null,
@@ -145,7 +148,7 @@ export async function readHomepage(domain: string): Promise<SiteFacts | null> {
   for (const candidate of [`https://${domain}/`, `https://www.${domain}/`, `http://${domain}/`]) {
     try {
       const page = await fetchPublicHtml(candidate);
-      if (page) return factsFrom(page.html);
+      if (page) return factsFrom(page.html, page.url);
     } catch {
       // Unreachable, refused or private: try the next form of the address.
     }

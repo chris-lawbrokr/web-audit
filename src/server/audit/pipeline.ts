@@ -1,7 +1,7 @@
 import 'server-only';
 
 import type { CheckKey } from '@/shared/audit/checks';
-import type { Discovery } from '@/shared/audit/contracts';
+import type { Discovery, HomepageFacts } from '@/shared/audit/contracts';
 import { formatNumber } from '@/shared/lib/format';
 
 import type { SiteFacts } from '../crawl/homepage';
@@ -95,6 +95,25 @@ function describeFirm(domain: string, site: SiteFacts | null, profile: Place | n
     area: practiceAreaOf(profile?.category ?? null, `${site?.title ?? ''} ${site?.text ?? ''}`),
   };
 }
+
+/** "+1-818-555-0100" → "(818) 555-0100"; anything that isn't a US number stays as the site wrote it. */
+function formatPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  const local = digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
+  return local.length === 10
+    ? `(${local.slice(0, 3)}) ${local.slice(3, 6)}-${local.slice(6)}`
+    : phone;
+}
+
+/** The homepage's facts on their own, for the report's "What your homepage told us". */
+const homepageFactsOf = (site: SiteFacts): HomepageFacts => ({
+  // "https://firm.com/" reads as "https://firm.com".
+  url: site.url.replace(/\/$/, ''),
+  name: site.names[0] ?? null,
+  phone: site.phone ? formatPhone(site.phone) : null,
+  place: site.city ? placeName(site.city, site.region) : null,
+  practiceArea: practiceAreaOf(null, `${site.title} ${site.text}`),
+});
 
 const businessOf = (place: Place): Business => ({
   name: place.name,
@@ -466,6 +485,10 @@ export async function runAudit(auditId: string): Promise<void> {
     const reviewsStep = stepper('reviews');
     reviewsStep(0);
     const site = await readHomepage(domain);
+    updateAudit(auditId, (current) => ({
+      ...current,
+      homepage: site ? homepageFactsOf(site) : null,
+    }));
     reviewsStep(1);
     let firm = describeFirm(domain, site, null);
     let competitors: Competitor[] = [];

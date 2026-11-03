@@ -52,11 +52,23 @@
     }
   }
 
-  /* "Download PDF" is the browser's print-to-PDF; keep the brand fills on paper. */
+  /*
+   * "Download PDF" is the browser's print-to-PDF; keep the brand fills on paper. The page itself prints
+   * white: the screen's gray ground would print as a tinted box inside the paper's white margins.
+   * No shadows on paper: Chrome prints a soft shadow as a solid gray box around the card. The cards'
+   * borders still outline them. `!important` because the shadow utilities sit in a later layer.
+   */
   @media print {
     body {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+      background-color: white;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-shadow: none !important;
     }
   }
 }

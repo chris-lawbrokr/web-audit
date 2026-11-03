@@ -138,5 +138,20 @@ Compared with the list in `04-backend.md` §11, the template is trimmed to what 
 - **The rest of the quality gate** from the scope's `starter-config/` (ESLint, knip, jscpd, dependency-cruiser,
   Vitest, Playwright with axe, lefthook, commitlint, CI, Renovate), Sentry, and the
   Content-Security-Policy.
-- **Fonts via `next/font`.** The page links Google's font stylesheet as the mock does, because the font
-  tokens name the faces as Google serves them and `next/font` would rename them.
+
+```bash
+https://www.ballmorselowe.com/
+https://ganttfamilylaw.com/
+https://www.dklawmd.com/
+https://www.military-defenseattorney.com/
+https://lawyersforjustice.com/
+https://kkoslawyers.com/
+https://illuminelegal.com/
+https://www.feplg.com/
+https://www.fighterlaw.com/
+https://www.marcjacobesq.com/
+https://www.conveyance.law/
+https://galelaw.ca/
+http://www.bbb-lawfirm.com/
+https://stalwartlaw.com/
+```

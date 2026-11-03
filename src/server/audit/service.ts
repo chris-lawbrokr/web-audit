@@ -26,6 +26,7 @@ export function createAudit(domain: string): AuditRecord {
     discoveries: [],
     results: {},
     competitorCount: 0,
+    homepage: null,
     spend: noSpend(),
     reportId: null,
   };
@@ -54,6 +55,7 @@ export function unlockAudit(auditId: string, lead: UnlockRequest, now: number): 
     headline: scored.headline,
     fixFirst: prioritiesFor(scored.categories),
     categories: scored.categories,
+    homepage: audit.homepage,
     lead: { firstName: lead.firstName, lastName: lead.lastName, email: lead.email },
   };
 
