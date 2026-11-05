@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { env } from '@/server/config/env';
 
+import { cached } from './cache';
 import { ProviderError, fetchWithTimeout } from './request';
 
 /*
@@ -43,7 +44,16 @@ export interface PageSpeed {
   incomplete: boolean;
 }
 
-export async function pageSpeed(
+/** Free, but the slowest call in the audit, so a result from the last 24 hours is reused. */
+export function pageSpeed(
+  url: string,
+  strategy: 'mobile' | 'desktop',
+  timeoutMs: number,
+): Promise<PageSpeed> {
+  return cached(`pagespeed ${strategy} ${url}`, () => runPageSpeed(url, strategy, timeoutMs));
+}
+
+async function runPageSpeed(
   url: string,
   strategy: 'mobile' | 'desktop',
   timeoutMs: number,

@@ -4,9 +4,11 @@ import 'server-only';
 export interface Spend {
   dataForSeoUsd: number;
   semrushUnits: number;
+  /** Paid calls answered from the last 24 hours instead (cache.ts), so not paid for again. */
+  reused: number;
 }
 
-export const noSpend = (): Spend => ({ dataForSeoUsd: 0, semrushUnits: 0 });
+export const noSpend = (): Spend => ({ dataForSeoUsd: 0, semrushUnits: 0, reused: 0 });
 
 /** A provider call that failed: an error status, a timeout, or an answer we couldn't read. */
 export class ProviderError extends Error {

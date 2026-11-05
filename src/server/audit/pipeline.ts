@@ -559,7 +559,8 @@ export async function runAudit(auditId: string): Promise<void> {
     });
     console.info(
       `[audit] ${domain} finished in ${Math.round((Date.now() - started) / 1000)}s · ` +
-        `DataForSEO $${spend.dataForSeoUsd.toFixed(3)} · Semrush ${spend.semrushUnits} units`,
+        `DataForSEO $${spend.dataForSeoUsd.toFixed(3)} · Semrush ${spend.semrushUnits} units` +
+        (spend.reused > 0 ? ` · ${spend.reused} paid calls reused from the last 24 hours` : ''),
     );
   }
 }

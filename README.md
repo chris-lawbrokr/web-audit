@@ -37,12 +37,15 @@ Health check: `GET /audit/api/health` → `{ "status": "ok" }`.
 3. Fill in the form (name and email are required) to unlock the report.
 4. On the report, "Download PDF" opens the print dialog, and "Book a walkthrough" opens the booking link.
 
-**Every audit spends money:** about $0.10 of DataForSEO credit and 40 Semrush units (PageSpeed
-Insights is free). The terminal logs each audit's cost as an `[audit]` line, any provider failure as an
-`[audit] … failed` line, and each submitted lead as a `[lead]` line.
+**Every new audit spends money:** about $0.10 of DataForSEO credit and 40 Semrush units (PageSpeed
+Insights is free). Provider answers are kept for 24 hours (`src/server/providers/cache.ts`), so
+re-auditing a domain within a day reuses them: it costs nothing and finishes in seconds. Only calls that
+failed are made again. The terminal logs each audit's cost as an `[audit]` line, including how many paid
+calls were reused, any provider failure as an `[audit] … failed` line, and each submitted lead as a
+`[lead]` line.
 
-Everything is kept in memory, so restarting the server forgets every audit and report; old links then
-show "We couldn't find that audit."
+Everything is kept in memory, so restarting the server forgets every audit, report and cached answer;
+old links then show "We couldn't find that audit."
 
 ## How it fits together
 
@@ -128,7 +131,6 @@ Compared with the list in `04-backend.md` §11, the template is trimmed to what 
 - **A server-generated PDF.** "Download PDF" is the browser's print-to-PDF, as in the mock.
 - **Protection.** Bot protection, rate limits and the daily spend ceiling. Real providers cost money on
   every audit, so this has to exist before the app is reachable by anyone else.
-- **Caching.** Re-auditing a domain within 24 hours runs (and pays for) everything again.
 - **The scan on Vercel.** It runs in-process after the response (`after()`), which works on a
   long-lived local server. On Vercel it moves to Vercel Workflows.
 - **Pinned addresses in the crawler.** `safe-fetch.ts` checks that a host resolves to public addresses,

@@ -4,13 +4,15 @@ import { z } from 'zod';
 
 import { env } from '@/server/config/env';
 
+import { cached } from './cache';
 import type { Spend } from './request';
 import { ProviderError, fetchWithTimeout } from './request';
 
 /*
  * DataForSEO (05 §2, §5, §6): Google Maps for the firm's profile and its competitors, Google's organic
  * results with the local pack and AI Overviews, and answers from ChatGPT and Perplexity. Live mode
- * only: queued tasks take minutes. Every call's cost is added to the audit's spend.
+ * only: queued tasks take minutes. Every call's cost is added to the audit's spend; an answer reused
+ * from the last 24 hours costs nothing.
  */
 
 const BASE = 'https://api.dataforseo.com/v3';
@@ -39,7 +41,20 @@ const envelope = z.object({
     .nullish(),
 });
 
-async function liveTask(
+function liveTask(
+  path: string,
+  task: Record<string, unknown>,
+  spend: Spend,
+  timeoutMs: number,
+): Promise<unknown> {
+  return cached(
+    `dataforseo ${path} ${JSON.stringify(task)}`,
+    () => callLiveTask(path, task, spend, timeoutMs),
+    () => (spend.reused += 1),
+  );
+}
+
+async function callLiveTask(
   path: string,
   task: Record<string, unknown>,
   spend: Spend,

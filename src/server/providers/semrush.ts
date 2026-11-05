@@ -2,6 +2,7 @@ import 'server-only';
 
 import { env } from '@/server/config/env';
 
+import { cached } from './cache';
 import type { Spend } from './request';
 import { ProviderError, fetchWithTimeout } from './request';
 
@@ -21,8 +22,19 @@ export interface SearchTraffic {
   keywords: number;
 }
 
-/** Null when Semrush has no data for the domain, which is common for small sites. */
-export async function searchTraffic(domain: string, spend: Spend): Promise<SearchTraffic | null> {
+/**
+ * Null when Semrush has no data for the domain, which is common for small sites. An answer from the
+ * last 24 hours, "no data" included, is reused instead of paid for again.
+ */
+export function searchTraffic(domain: string, spend: Spend): Promise<SearchTraffic | null> {
+  return cached(
+    `semrush domain_rank us ${domain}`,
+    () => fetchSearchTraffic(domain, spend),
+    () => (spend.reused += 1),
+  );
+}
+
+async function fetchSearchTraffic(domain: string, spend: Spend): Promise<SearchTraffic | null> {
   const url = new URL('https://api.semrush.com/');
   url.search = new URLSearchParams({
     type: 'domain_rank',
